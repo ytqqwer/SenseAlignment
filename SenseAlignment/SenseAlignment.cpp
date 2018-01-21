@@ -8,6 +8,10 @@
 #include <commdlg.h>
 #include <CommCtrl.h>
 
+//// 导入静态库  
+//#pragma comment(lib, "Comctl32.lib")  
+//// 开启视觉效果 Copy from MSDN  
+//#pragma comment(linker,"\"/manifestdependency:type='win32' name = 'Microsoft.Windows.Common-Controls' version = '6.0.0.0' processorArchitecture = '*' publicKeyToken = '6595b64144ccf1df' language = '*'\"")
 
 #define MAX_LOADSTRING 100
 
@@ -16,20 +20,27 @@ HINSTANCE hInst;                                // 当前实例
 WCHAR szTitle[MAX_LOADSTRING];                  // 标题栏文本
 WCHAR szWindowClass[MAX_LOADSTRING];            // 主窗口类名
 
+HWND hSearchEdit;							// 搜索框句柄
+HWND hClassComboBox;						// 类别下拉列表句柄
+HWND hSearchButton;							// 搜索按钮句柄
 
+HWND hDictionaryOneListView;					// 词典1列表视图句柄
+HWND hDictionaryTwoListView;					// 词典2列表视图句柄
 
+HWND hDictionaryOneDetailsListView;				// 词典1更详细列表视图句柄
+HWND hDictionaryTwoDetailsListView;				// 词典2更详细列表视图句柄
 
-HWND hInstBase;                                // 当前主窗口实例
-HWND hInstDown;
-HWND hInstSend;
-HWND hInstResv;
-HWND hInstProcess;
-HWND hInstEditDst;
-HWND hInstEditSrc;
-HWND hwndPB;
+HWND hSimilarityText;						// 相似度
+HWND hRelationshipText;						// 对应关心
+HWND hNewRelationshipText;					// 新对应关系
 
+HWND hRelationEqualButton;					// 相等按钮
+HWND hRelationNotEqualButton;				// 不相等按钮
+HWND hRelationUnsureButton;					// 不确定按钮
+HWND hRelationBelongButton;					// 属于按钮
 
-
+//旧搜索编辑框处理过程
+WNDPROC oldEditSearchProc;
 
 // 此代码模块中包含的函数的前向声明: 
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -37,46 +48,44 @@ BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
+//搜索编辑框处理过程
+LRESULT CALLBACK	subEditSearchProc(HWND, UINT, WPARAM, LPARAM);
+
 int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
-                     _In_opt_ HINSTANCE hPrevInstance,
-                     _In_ LPWSTR    lpCmdLine,
-                     _In_ int       nCmdShow)
+	_In_opt_ HINSTANCE hPrevInstance,
+	_In_ LPWSTR    lpCmdLine,
+	_In_ int       nCmdShow)
 {
-    UNREFERENCED_PARAMETER(hPrevInstance);
-    UNREFERENCED_PARAMETER(lpCmdLine);
+	UNREFERENCED_PARAMETER(hPrevInstance);
+	UNREFERENCED_PARAMETER(lpCmdLine);
 
-    // TODO: 在此放置代码。
+	// TODO: 在此放置代码。
 
-    // 初始化全局字符串
-    LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
-    LoadStringW(hInstance, IDC_SENSEALIGNMENT, szWindowClass, MAX_LOADSTRING);
-    MyRegisterClass(hInstance);
-
-
-	ShowWindow(hInstBase, SW_SHOW);
-	UpdateWindow(hInstBase);
-
-    // 执行应用程序初始化: 
-    if (!InitInstance (hInstance, nCmdShow))
-    {
-        return FALSE;
-    }
+	// 初始化全局字符串
+	LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
+	LoadStringW(hInstance, IDC_SENSEALIGNMENT, szWindowClass, MAX_LOADSTRING);
+	MyRegisterClass(hInstance);
 	
-    HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_SENSEALIGNMENT));
+	// 执行应用程序初始化: 
+	if (!InitInstance(hInstance, nCmdShow))
+	{
+		return FALSE;
+	}
 
-    MSG msg;
+	HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_SENSEALIGNMENT));
 
-    // 主消息循环: 
-    while (GetMessage(&msg, nullptr, 0, 0))
-    {
-        if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
-        {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
-        }
-    }
+	MSG msg;
+	// 主消息循环: 
+	while (GetMessage(&msg, nullptr, 0, 0))
+	{
+		if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
+		{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+	}
 
-    return (int) msg.wParam;
+	return (int)msg.wParam;
 }
 
 
@@ -88,23 +97,23 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 //
 ATOM MyRegisterClass(HINSTANCE hInstance)
 {
-    WNDCLASSEXW wcex;
+	WNDCLASSEXW wcex;
 
-    wcex.cbSize = sizeof(WNDCLASSEX);
+	wcex.cbSize = sizeof(WNDCLASSEX);
 
-    wcex.style          = CS_HREDRAW | CS_VREDRAW;
-    wcex.lpfnWndProc    = WndProc;
-    wcex.cbClsExtra     = 0;
-    wcex.cbWndExtra     = 0;
-    wcex.hInstance      = hInstance;
-    wcex.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_SENSEALIGNMENT));
-    wcex.hCursor        = LoadCursor(nullptr, IDC_ARROW);
-    wcex.hbrBackground  = (HBRUSH)(COLOR_WINDOW+1);
-    wcex.lpszMenuName   = MAKEINTRESOURCEW(IDC_SENSEALIGNMENT);
-    wcex.lpszClassName  = szWindowClass;
-    wcex.hIconSm        = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
+	wcex.style = CS_HREDRAW | CS_VREDRAW;
+	wcex.lpfnWndProc = WndProc;
+	wcex.cbClsExtra = 0;
+	wcex.cbWndExtra = 0;
+	wcex.hInstance = hInstance;
+	wcex.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_SENSEALIGNMENT));
+	wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
+	wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 0);
+	wcex.lpszMenuName = MAKEINTRESOURCEW(IDC_SENSEALIGNMENT);
+	wcex.lpszClassName = szWindowClass;
+	wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
 
-    return RegisterClassExW(&wcex);
+	return RegisterClassExW(&wcex);
 }
 
 //
@@ -119,122 +128,206 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 //
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
-   hInst = hInstance; // 将实例句柄存储在全局变量中
+	hInst = hInstance; // 将实例句柄存储在全局变量中
 
-   HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-      CW_USEDEFAULT, 0, 800, 600, nullptr, nullptr, hInstance, nullptr);
+	HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
+		CW_USEDEFAULT, 0, 800, 450, nullptr, nullptr, hInstance, nullptr);
 
-   if (!hWnd)
-   {
-      return FALSE;
-   }
-
-   hInstBase = hWnd;
-   hInstDown = CreateWindow(_T("BUTTON"), _T("发送"), WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON, 580, 30, 100, 90, hInstBase, (HMENU)1001, NULL, NULL);
-   hInstProcess = CreateWindow(_T("Static"), _T("0 %"), WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON, 580, 150, 100, 30, hInstBase, (HMENU)1002, NULL, NULL);
-   hInstSend = CreateWindow(_T("BUTTON"), _T("发送文件"), WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON, 490, 30, 80, 30, hInstBase, (HMENU)1003, NULL, NULL);
-   hInstResv = CreateWindow(_T("BUTTON"), _T("接收路径"), WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON, 490, 90, 80, 30, hInstBase, (HMENU)1004, NULL, NULL);
-   CreateWindow(_T("Static"), _T("进度条"), WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON, 30, 150, 80, 30, hInstBase, (HMENU)1005, NULL, NULL);
-   hInstEditSrc = CreateWindow(_T("EDIT"), NULL, WS_CHILD | WS_VISIBLE | WS_BORDER, 30, 30, 450, 30, hInstBase, (HMENU)1006, NULL, NULL);
-   hInstEditDst = CreateWindow(_T("EDIT"), NULL, WS_CHILD | WS_VISIBLE | WS_BORDER, 30, 90, 450, 30, hInstBase, (HMENU)1007, NULL, NULL);
-   SetWindowText(hInstEditSrc, _T("SrcFilename:"));
-   SetWindowText(hInstEditDst, _T("DstFilename:"));
-   EnableWindow(hInstDown, FALSE);
-
-   hwndPB = CreateWindowEx( //创建进度条
-	   0,
-	   PROGRESS_CLASS,
-	   NULL,
-	   WS_CHILD | WS_VISIBLE,
-	   120, 150, 450, 30,            //位置和大小在WM_SIZE中设置
-	   hInstBase,
-	   (HMENU)0,
-	   NULL,
-	   NULL);
-   SendMessage(hWnd, WM_CREATE, NULL, NULL);
-
-   ShowWindow(hWnd, nCmdShow);
-   UpdateWindow(hWnd);
-
-   return TRUE;
-}
-
-DWORD WINAPI PBThreadProc(LPVOID lpParameter)
-{
-	//进度条 start
-
-
-	ShowWindow(hwndPB, SW_SHOW);        //显示进度条
-
-	ShowWindow(hInstProcess, SW_SHOW);  //显示百分比控件
-
-	PBRANGE range;                        //进度条的范围
-
-
-	SendMessage(hwndPB, PBM_SETRANGE,    //设置进度条的范围
-
-		(WPARAM)0, (LPARAM)(MAKELPARAM(0, 100)));
-
-
-	SendMessage(hwndPB, PBM_GETRANGE,    //获取进度条的范围
-
-		(WPARAM)TRUE,                    //TRUE 表示返回值为范围的最小值,FALSE表示返回最大值
-
-		(LPARAM)&range);
-	//进度条 end
-
-
-	//设置进度条当前值
-	TCHAR sumdata[64];
-
-	for (size_t i = 1; i <= 100; i++)
+	if (!hWnd)
 	{
-		SendMessage(hwndPB, PBM_SETPOS, (WPARAM)(i), (LPARAM)0);
-		swprintf(sumdata, _T("%d %%"), i);
-		SetDlgItemText(hInstBase, 1002, sumdata);
-		Sleep(100);
+		return FALSE;
 	}
 
-	SetDlgItemText(hInstBase, 1001, _T("发送"));
-	EnableWindow(hInstDown, TRUE);
-	TCHAR buff[80] = _T("");
+	//初始化搜索编辑框
+	hSearchEdit = CreateWindow(_T("EDIT"), NULL, WS_CHILD | WS_VISIBLE | WS_BORDER | ES_AUTOHSCROLL | ES_LEFT,
+		70, 30, 200, 30, hWnd, (HMENU)ID_SEARCH_EDIT, hInst, NULL);
+	oldEditSearchProc = (WNDPROC)SetWindowLongPtr(hSearchEdit, GWLP_WNDPROC, (LONG_PTR)subEditSearchProc);
 
-	GetWindowText(hInstEditSrc, buff, 80);
+	//初始化搜索类别下拉列表
+	hClassComboBox = CreateWindow(WC_COMBOBOX, _T(""), CBS_DROPDOWNLIST | CBS_HASSTRINGS | WS_CHILD | WS_OVERLAPPED | WS_VISIBLE ,
+		310, 30, 100, 500, hWnd, (HMENU)ID_SEARCH_COMBOBOX, hInst, NULL);
+	
+	// load the combobox with item list. Send a CB_ADDSTRING message to load each item
+	TCHAR temp[100];
 
+	LoadStringW(hInstance, ID_PART_OF_SPEECH_N, temp, MAX_LOADSTRING);
+	SendMessage(hClassComboBox, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)temp);
+	
+	LoadStringW(hInstance, ID_PART_OF_SPEECH_V, temp, MAX_LOADSTRING);
+	SendMessage(hClassComboBox, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)temp);
+
+	LoadStringW(hInstance, ID_PART_OF_SPEECH_A, temp, MAX_LOADSTRING);
+	SendMessage(hClassComboBox, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)temp);
+
+	LoadStringW(hInstance, ID_PART_OF_SPEECH_M, temp, MAX_LOADSTRING);
+	SendMessage(hClassComboBox, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)temp);
+
+	LoadStringW(hInstance, ID_PART_OF_SPEECH_Q, temp, MAX_LOADSTRING);
+	SendMessage(hClassComboBox, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)temp);
+
+	LoadStringW(hInstance, ID_PART_OF_SPEECH_R, temp, MAX_LOADSTRING);
+	SendMessage(hClassComboBox, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)temp);
+
+	LoadStringW(hInstance, ID_PART_OF_SPEECH_D, temp, MAX_LOADSTRING);
+	SendMessage(hClassComboBox, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)temp);
+	
+	LoadStringW(hInstance, ID_PART_OF_SPEECH_P, temp, MAX_LOADSTRING);
+	SendMessage(hClassComboBox, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)temp);
+
+	LoadStringW(hInstance, ID_PART_OF_SPEECH_C, temp, MAX_LOADSTRING);
+	SendMessage(hClassComboBox, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)temp);
+
+	LoadStringW(hInstance, ID_PART_OF_SPEECH_U, temp, MAX_LOADSTRING);
+	SendMessage(hClassComboBox, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)temp);
+
+	LoadStringW(hInstance, ID_PART_OF_SPEECH_E, temp, MAX_LOADSTRING);
+	SendMessage(hClassComboBox, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)temp);
+
+	LoadStringW(hInstance, ID_PART_OF_SPEECH_O, temp, MAX_LOADSTRING);
+	SendMessage(hClassComboBox, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)temp);
+	
+	// Send the CB_SETCURSEL message to display an initial item in the selection field  
+	SendMessage(hClassComboBox, CB_SETCURSEL, (WPARAM)0, (LPARAM)0);
+	
+	//初始化搜索按钮
+	hSearchButton = CreateWindow(_T("BUTTON"), _T("搜索"), WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON,
+		430, 30, 100, 30, hWnd, (HMENU)ID_SEARCH_BUTTON, hInst, NULL);
+	
+	//初始化文本
+	CreateWindow(_T("static"), _T("词语"), WS_CHILD | WS_VISIBLE | SS_LEFT, 30, 30, 30, 30, hWnd,
+		NULL, hInst, NULL);
+	CreateWindow(_T("static"), _T("词类"), WS_CHILD | WS_VISIBLE | SS_LEFT, 270, 30, 30, 30, hWnd,
+		NULL, hInst, NULL);
+
+	CreateWindow(_T("static"), _T("词典1"), WS_CHILD | WS_VISIBLE | SS_LEFT, 30, 110, 40, 30, hWnd,
+		NULL, hInst, NULL);
+	CreateWindow(_T("static"), _T("词典2"), WS_CHILD | WS_VISIBLE | SS_LEFT, 30, 210, 40, 30, hWnd,
+		NULL, hInst, NULL);
+
+	LoadStringW(hInstance, ID_TEXT_STATIC_SIMILARITY, temp, MAX_LOADSTRING);
+	HWND hSimilarityStaticText = CreateWindow(_T("static"), temp, WS_CHILD | WS_VISIBLE | SS_LEFT, 550, 10, 100, 30, hWnd,
+		(HMENU)ID_TEXT_STATIC_SIMILARITY, hInst, NULL);
+	hSimilarityText = CreateWindow(_T("static"), _T("test"), WS_CHILD | WS_VISIBLE | WS_BORDER | SS_LEFT, 650, 10, 90, 30, hWnd,
+		(HMENU)ID_TEXT_SIMILARITY, hInst, NULL);
+	
+	LoadStringW(hInstance, ID_TEXT_STATIC_RELATIONSHIP, temp, MAX_LOADSTRING);
+	HWND hRelationshipStaticText = CreateWindow(_T("static"), temp, WS_CHILD | WS_VISIBLE | SS_LEFT, 550, 40, 100, 30, hWnd,
+		(HMENU)ID_TEXT_STATIC_RELATIONSHIP, hInst, NULL);
+	hRelationshipText = CreateWindow(_T("static"), _T("test"), WS_CHILD | WS_VISIBLE | WS_BORDER | SS_LEFT, 650, 40, 90, 30, hWnd,
+		(HMENU)ID_TEXT_RELATIONSHIP, hInst, NULL);
+
+	LoadStringW(hInstance, ID_TEXT_STATIC_NEW_RELATIONSHIP, temp, MAX_LOADSTRING);
+	HWND hNewRelationshipStaticText = CreateWindow(_T("static"), temp, WS_CHILD | WS_VISIBLE | SS_LEFT, 550, 70, 100, 30, hWnd,
+		(HMENU)ID_TEXT_STATIC_NEW_RELATIONSHIP, hInst, NULL);
+	hNewRelationshipText = CreateWindow(_T("static"), _T("test"), WS_CHILD | WS_VISIBLE| WS_BORDER | SS_LEFT, 650, 70, 90, 30, hWnd,
+		(HMENU)ID_TEXT_NEW_RELATIONSHIP, hInst, NULL);
+
+	//初始化词典1的列表视图
+	hDictionaryOneListView = CreateWindow(WC_LISTVIEW, L"",	WS_CHILD | WS_VISIBLE | LVS_REPORT | WS_BORDER,
+		30, 140, 600,45, hWnd,	(HMENU)ID_DICTIONARY_ONE_LISTVIEW,	hInst,	NULL);
+	
+	WCHAR szText[256];     // Temporary buffer.
+	LVCOLUMN lvc;
+	int iCol;
+	// Initialize the LVCOLUMN structure.
+	// The mask specifies that the format, width, text,
+	// and subitem members of the structure are valid.
+	lvc.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
+
+	// Add the columns.
+	for (iCol = 0; iCol < 4; iCol++)
+	{
+		lvc.iSubItem = iCol;
+		lvc.pszText = szText;
+		lvc.fmt = LVCFMT_LEFT;		// Left-aligned column.
+
+		if (iCol < 2)				// Width of column in pixels.
+			lvc.cx = 100;             
+		else
+			lvc.cx = 200;
+									// Load the names of the column headings from the string resources.
+		LoadString(hInst, ID_DICTIONARY_COLUMN_WORDS + iCol, szText, sizeof(szText) / sizeof(szText[0]));
+
+		// Insert the columns into the list view.
+		if (ListView_InsertColumn(hDictionaryOneListView, iCol, &lvc) == -1)
+			return FALSE;
+	}
+	
+	//初始化词典2的列表视图
+	hDictionaryTwoListView = CreateWindow(WC_LISTVIEW, L"", WS_CHILD | WS_VISIBLE | LVS_REPORT | WS_BORDER,
+		30, 240, 600, 45, hWnd, (HMENU)ID_DICTIONARY_ONE_LISTVIEW, hInst, NULL);
+
+	// Add the columns.
+	for (iCol = 0; iCol < 4; iCol++)
+	{
+		lvc.iSubItem = iCol;
+		lvc.pszText = szText;
+		lvc.fmt = LVCFMT_LEFT;		// Left-aligned column.
+
+		if (iCol < 2)				// Width of column in pixels.
+			lvc.cx = 100;
+		else
+			lvc.cx = 200;
+
+		// Load the names of the column headings from the string resources.
+		LoadString(hInst, ID_DICTIONARY_COLUMN_WORDS + iCol, szText, sizeof(szText) / sizeof(szText[0]));
+
+		// Insert the columns into the list view.
+		if (ListView_InsertColumn(hDictionaryTwoListView, iCol, &lvc) == -1)
+			return FALSE;
+	}
+	
+	//初始化对应关系按钮
+	hRelationEqualButton = CreateWindow(_T("BUTTON"), _T("相等"), WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON,
+		650, 120, 100, 30, hWnd, (HMENU)ID_EQUAL_BUTTON, hInst, NULL);
+
+	hRelationNotEqualButton = CreateWindow(_T("BUTTON"), _T("不相等"), WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON,
+		650, 170, 100, 30, hWnd, (HMENU)ID_NOT_EQUAL_BUTTON, hInst, NULL);
+
+	hRelationUnsureButton = CreateWindow(_T("BUTTON"), _T("不确定"), WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON,
+		650, 220, 100, 30, hWnd, (HMENU)ID_UNSURE_BUTTON, hInst, NULL);
+	
+	hRelationBelongButton = CreateWindow(_T("BUTTON"), _T("属于"), WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON,
+		650, 270, 100, 30, hWnd, (HMENU)ID_BELONG_BUTTON, hInst, NULL);
+	
+	//下一个按钮
+
+	hRelationBelongButton = CreateWindow(_T("BUTTON"), _T("下一词义"), WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON,
+		200, 330, 100, 30, hWnd, (HMENU)ID_NEXT_SENSE_BUTTON, hInst, NULL);
+	
+	hRelationBelongButton = CreateWindow(_T("BUTTON"), _T("下一词语"), WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON,
+		350, 330, 100, 30, hWnd, (HMENU)ID_NEXT_WORD_BUTTON, hInst, NULL);
+
+
+
+	ShowWindow(hWnd, nCmdShow);
+	UpdateWindow(hWnd);
+
+	return TRUE;
+}
+
+
+// 搜索编辑框 的消息处理函数
+LRESULT CALLBACK subEditSearchProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	switch (msg)
+	{
+	case WM_KEYDOWN:
+		switch (wParam)
+		{
+		case VK_RETURN:
+			//Do your stuff
+
+			DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
+
+			break;  //or return 0; if you don't want to pass it further to def proc
+					//If not your key, skip to default:
+		}
+	default:
+		return CallWindowProc(oldEditSearchProc, hWnd, msg, wParam, lParam);
+	}
 	return 0;
 }
-
-void OpenFile()
-{
-	OPENFILENAME opfn;
-	opfn.hwndOwner = hInstBase;
-	WCHAR strFilename[MAX_PATH];//存放文件名  
-								//初始化  
-	ZeroMemory(&opfn, sizeof(OPENFILENAME));
-	opfn.lStructSize = sizeof(OPENFILENAME);//结构体大小  
-											//设置过滤  
-	opfn.lpstrFilter = L"文本文件\0*.txt\0";
-	//默认过滤器索引设为1  
-	opfn.nFilterIndex = 1;
-	//文件名的字段必须先把第一个字符设为 \0  
-	opfn.lpstrFile = strFilename;
-	opfn.lpstrFile[0] = '\0';
-	opfn.nMaxFile = sizeof(strFilename);
-	//设置标志位，检查目录或文件是否存在  
-	opfn.Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST;
-	//opfn.lpstrInitialDir = NULL;  
-	// 显示对话框让用户选择文件  
-	if (GetOpenFileName(&opfn))
-	{
-		//在文本框中显示文件路径  
-		SetWindowText(hInstEditSrc, opfn.lpstrFile);
-	}
-	EnableWindow(hInstBase, TRUE);
-}
-
-
-
-
 
 
 //
@@ -250,90 +343,132 @@ void OpenFile()
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
-    {
-    case WM_COMMAND:
-        {
-            int wmId = LOWORD(wParam);
-			int wmEvent = HIWORD(wParam);
+	{
+	case WM_COMMAND:
+	{
+		// 分析wParam全部: 
+		//switch (wParam)
+		//{
+		//case CBN_SELCHANGE:
+		//{
+		//
+		//}
+		//break;
+		//default:
+		//	//继续处理
+		//	break;
+		//}
 
+		// 分析wParam高位: 
+		switch (HIWORD(wParam))
+		{
+		case CBN_SELCHANGE: 
+		{
+			// If the user makes a selection from the list:
+			//   Send CB_GETCURSEL message to get the index of the selected list item.
+			//   Send CB_GETLBTEXT message to get the item.
+			//   Display the item in a messagebox.
 
-			switch (wmEvent)
-			{
-			case BN_CLICKED:
-			{
-				if (1001 == wmId)
-				{
-					SetDlgItemText(hInstBase, 1001, _T("正在发送..."));
-					EnableWindow(hInstDown, FALSE);
-					//创建线程
-					CreateThread(
-						NULL,
-						0,
-						(LPTHREAD_START_ROUTINE)PBThreadProc,
-						NULL,
-						0,
-						0
-					);
-				}
-				else if (1003 == wmId)
-				{
-					EnableWindow(hInstBase, FALSE);
-					OpenFile();
-				}
-			}
+			int ItemIndex = SendMessage((HWND)lParam, (UINT)CB_GETCURSEL,
+				(WPARAM)0, (LPARAM)0);
+			TCHAR  ListItem[256];
+			(TCHAR)SendMessage((HWND)lParam, (UINT)CB_GETLBTEXT,
+				(WPARAM)ItemIndex, (LPARAM)ListItem);
+			MessageBox(hWnd, (LPCWSTR)ListItem, TEXT("Item Selected"), MB_OK);
+
+		}
 			break;
-			default:
-				break;
-			}
+		default:
+			//继续处理
+			break;
+		}
+		
+		// 分析wParam低位: 
+		switch (LOWORD(wParam))
+		{
+		case ID_SEARCH_BUTTON:
+			MessageBox(hWnd, L"您点击了一个按钮。", L"提示", MB_OK);
+			break;
+		case ID_EQUAL_BUTTON:
+			MessageBox(hWnd, L"点击了一个按钮。", L"提示", MB_OKCANCEL);
+			break;
+		case ID_NOT_EQUAL_BUTTON:
+			MessageBox(hWnd, L"一个按钮。", L"提示", MB_OK);
+			break;
+		case ID_UNSURE_BUTTON:
+			MessageBox(hWnd, L"点击按钮。", L"提示", MB_OKCANCEL);
+			break;
+		case ID_BELONG_BUTTON:
+			MessageBox(hWnd, L"点了个按钮。", L"提示", MB_OK);
+			break;
+		case ID_NEXT_SENSE_BUTTON:
+			MessageBox(hWnd, L"按钮。", L"提示", MB_OKCANCEL);
+			break;
+		case ID_NEXT_WORD_BUTTON:
+			MessageBox(hWnd, L"点按钮。", L"Tip", MB_OK);
+			break;
 
-			
-            // 分析菜单选择: 
-            switch (wmId)
-            {
-            case IDM_ABOUT:
-                DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
-                break;
-            case IDM_EXIT:
-                DestroyWindow(hWnd);
-                break;
-            default:
-                return DefWindowProc(hWnd, message, wParam, lParam);
-            }
-        }
-        break;
-    case WM_PAINT:
-        {
-            PAINTSTRUCT ps;
-            HDC hdc = BeginPaint(hWnd, &ps);
-            // TODO: 在此处添加使用 hdc 的任何绘图代码...
-            EndPaint(hWnd, &ps);
-        }
-        break;
-    case WM_DESTROY:
-        PostQuitMessage(0);
-        break;
-    default:
-        return DefWindowProc(hWnd, message, wParam, lParam);
-    }
-    return 0;
+
+		case IDM_ABOUT:
+			DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
+			break;
+		case IDM_EXIT:
+			DestroyWindow(hWnd);
+			break;
+		default:
+			return DefWindowProc(hWnd, message, wParam, lParam);
+		}
+
+		//// 分析lParam全部: 
+		//switch (lParam)
+		//{
+		//case ID_SEARCH_BUTTON:
+		//{
+		//	MessageBox(hWnd, L"您点击了一个按钮。", L"提示", MB_OK);
+		//}
+		//break;
+		//default:
+		//	return DefWindowProc(hWnd, message, wParam, lParam);
+		//}
+
+
+	}
+	break;
+	case WM_PAINT:
+	{
+		PAINTSTRUCT ps;
+		HDC hdc = BeginPaint(hWnd, &ps);
+		// TODO: 在此处添加使用 hdc 的任何绘图代码...
+		
+		EndPaint(hWnd, &ps);
+	}
+	break;
+	case WM_DESTROY:
+		PostQuitMessage(0);
+		break;
+	default:
+		return DefWindowProc(hWnd, message, wParam, lParam);
+	}
+
+	return 0;
 }
 
 // “关于”框的消息处理程序。
 INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    UNREFERENCED_PARAMETER(lParam);
-    switch (message)
-    {
-    case WM_INITDIALOG:
-        return (INT_PTR)TRUE;
+	UNREFERENCED_PARAMETER(lParam);
+	switch (message)
+	{
+	case WM_INITDIALOG:
+		return (INT_PTR)TRUE;
 
-    case WM_COMMAND:
-        if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
-        {
-            EndDialog(hDlg, LOWORD(wParam));
-            return (INT_PTR)TRUE;
-        }
-        break;
-    }
-    return (INT_PTR)FALSE;
+	case WM_COMMAND:
+		if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
+		{
+			EndDialog(hDlg, LOWORD(wParam));
+			return (INT_PTR)TRUE;
+		}
+		break;
+	}
+	return (INT_PTR)FALSE;
 }
