@@ -1,4 +1,4 @@
-// SenseAlignment.cpp : ¶¨ÒåÓ¦ÓÃ³ÌĞòµÄÈë¿Úµã¡£
+ï»¿// SenseAlignment.cpp : å®šä¹‰åº”ç”¨ç¨‹åºçš„å…¥å£ç‚¹ã€‚
 //
 
 #include "stdafx.h"
@@ -8,47 +8,47 @@
 #include <commdlg.h>
 #include <CommCtrl.h>
 
-//// µ¼Èë¾²Ì¬¿â  
+//// å¯¼å…¥é™æ€åº“  
 //#pragma comment(lib, "Comctl32.lib")  
-//// ¿ªÆôÊÓ¾õĞ§¹û Copy from MSDN  
+//// å¼€å¯è§†è§‰æ•ˆæœ Copy from MSDN  
 //#pragma comment(linker,"\"/manifestdependency:type='win32' name = 'Microsoft.Windows.Common-Controls' version = '6.0.0.0' processorArchitecture = '*' publicKeyToken = '6595b64144ccf1df' language = '*'\"")
 
 #define MAX_LOADSTRING 100
 
-// È«¾Ö±äÁ¿: 
-HINSTANCE hInst;                                // µ±Ç°ÊµÀı
-WCHAR szTitle[MAX_LOADSTRING];                  // ±êÌâÀ¸ÎÄ±¾
-WCHAR szWindowClass[MAX_LOADSTRING];            // Ö÷´°¿ÚÀàÃû
+// å…¨å±€å˜é‡: 
+HINSTANCE hInst;                                // å½“å‰å®ä¾‹
+WCHAR szTitle[MAX_LOADSTRING];                  // æ ‡é¢˜æ æ–‡æœ¬
+WCHAR szWindowClass[MAX_LOADSTRING];            // ä¸»çª—å£ç±»å
 
-HWND hSearchEdit;							// ËÑË÷¿ò¾ä±ú
-HWND hClassComboBox;						// Àà±ğÏÂÀ­ÁĞ±í¾ä±ú
-HWND hSearchButton;							// ËÑË÷°´Å¥¾ä±ú
+HWND hSearchEdit;							// æœç´¢æ¡†å¥æŸ„
+HWND hClassComboBox;						// ç±»åˆ«ä¸‹æ‹‰åˆ—è¡¨å¥æŸ„
+HWND hSearchButton;							// æœç´¢æŒ‰é’®å¥æŸ„
 
-HWND hDictionaryOneListView;					// ´Êµä1ÁĞ±íÊÓÍ¼¾ä±ú
-HWND hDictionaryTwoListView;					// ´Êµä2ÁĞ±íÊÓÍ¼¾ä±ú
+HWND hDictionaryOneListView;					// è¯å…¸1åˆ—è¡¨è§†å›¾å¥æŸ„
+HWND hDictionaryTwoListView;					// è¯å…¸2åˆ—è¡¨è§†å›¾å¥æŸ„
 
-HWND hDictionaryOneDetailsListView;				// ´Êµä1¸üÏêÏ¸ÁĞ±íÊÓÍ¼¾ä±ú
-HWND hDictionaryTwoDetailsListView;				// ´Êµä2¸üÏêÏ¸ÁĞ±íÊÓÍ¼¾ä±ú
+HWND hDictionaryOneDetailsListView;				// è¯å…¸1æ›´è¯¦ç»†åˆ—è¡¨è§†å›¾å¥æŸ„
+HWND hDictionaryTwoDetailsListView;				// è¯å…¸2æ›´è¯¦ç»†åˆ—è¡¨è§†å›¾å¥æŸ„
 
-HWND hSimilarityText;						// ÏàËÆ¶È
-HWND hRelationshipText;						// ¶ÔÓ¦¹ØĞÄ
-HWND hNewRelationshipText;					// ĞÂ¶ÔÓ¦¹ØÏµ
+HWND hSimilarityText;						// ç›¸ä¼¼åº¦
+HWND hRelationshipText;						// å¯¹åº”å…³å¿ƒ
+HWND hNewRelationshipText;					// æ–°å¯¹åº”å…³ç³»
 
-HWND hRelationEqualButton;					// ÏàµÈ°´Å¥
-HWND hRelationNotEqualButton;				// ²»ÏàµÈ°´Å¥
-HWND hRelationUnsureButton;					// ²»È·¶¨°´Å¥
-HWND hRelationBelongButton;					// ÊôÓÚ°´Å¥
+HWND hRelationEqualButton;					// ç›¸ç­‰æŒ‰é’®
+HWND hRelationNotEqualButton;				// ä¸ç›¸ç­‰æŒ‰é’®
+HWND hRelationUnsureButton;					// ä¸ç¡®å®šæŒ‰é’®
+HWND hRelationBelongButton;					// å±äºæŒ‰é’®
 
-//¾ÉËÑË÷±à¼­¿ò´¦Àí¹ı³Ì
+//æ—§æœç´¢ç¼–è¾‘æ¡†å¤„ç†è¿‡ç¨‹
 WNDPROC oldEditSearchProc;
 
-// ´Ë´úÂëÄ£¿éÖĞ°üº¬µÄº¯ÊıµÄÇ°ÏòÉùÃ÷: 
+// æ­¤ä»£ç æ¨¡å—ä¸­åŒ…å«çš„å‡½æ•°çš„å‰å‘å£°æ˜: 
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
-//ËÑË÷±à¼­¿ò´¦Àí¹ı³Ì
+//æœç´¢ç¼–è¾‘æ¡†å¤„ç†è¿‡ç¨‹
 LRESULT CALLBACK	subEditSearchProc(HWND, UINT, WPARAM, LPARAM);
 
 int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
@@ -59,14 +59,14 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
-	// TODO: ÔÚ´Ë·ÅÖÃ´úÂë¡£
+	// TODO: åœ¨æ­¤æ”¾ç½®ä»£ç ã€‚
 
-	// ³õÊ¼»¯È«¾Ö×Ö·û´®
+	// åˆå§‹åŒ–å…¨å±€å­—ç¬¦ä¸²
 	LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
 	LoadStringW(hInstance, IDC_SENSEALIGNMENT, szWindowClass, MAX_LOADSTRING);
 	MyRegisterClass(hInstance);
 	
-	// Ö´ĞĞÓ¦ÓÃ³ÌĞò³õÊ¼»¯: 
+	// æ‰§è¡Œåº”ç”¨ç¨‹åºåˆå§‹åŒ–: 
 	if (!InitInstance(hInstance, nCmdShow))
 	{
 		return FALSE;
@@ -75,7 +75,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 	HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_SENSEALIGNMENT));
 
 	MSG msg;
-	// Ö÷ÏûÏ¢Ñ­»·: 
+	// ä¸»æ¶ˆæ¯å¾ªç¯: 
 	while (GetMessage(&msg, nullptr, 0, 0))
 	{
 		if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
@@ -91,9 +91,9 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 
 
 //
-//  º¯Êı: MyRegisterClass()
+//  å‡½æ•°: MyRegisterClass()
 //
-//  Ä¿µÄ: ×¢²á´°¿ÚÀà¡£
+//  ç›®çš„: æ³¨å†Œçª—å£ç±»ã€‚
 //
 ATOM MyRegisterClass(HINSTANCE hInstance)
 {
@@ -117,18 +117,18 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 }
 
 //
-//   º¯Êı: InitInstance(HINSTANCE, int)
+//   å‡½æ•°: InitInstance(HINSTANCE, int)
 //
-//   Ä¿µÄ: ±£´æÊµÀı¾ä±ú²¢´´½¨Ö÷´°¿Ú
+//   ç›®çš„: ä¿å­˜å®ä¾‹å¥æŸ„å¹¶åˆ›å»ºä¸»çª—å£
 //
-//   ×¢ÊÍ: 
+//   æ³¨é‡Š: 
 //
-//        ÔÚ´Ëº¯ÊıÖĞ£¬ÎÒÃÇÔÚÈ«¾Ö±äÁ¿ÖĞ±£´æÊµÀı¾ä±ú²¢
-//        ´´½¨ºÍÏÔÊ¾Ö÷³ÌĞò´°¿Ú¡£
+//        åœ¨æ­¤å‡½æ•°ä¸­ï¼Œæˆ‘ä»¬åœ¨å…¨å±€å˜é‡ä¸­ä¿å­˜å®ä¾‹å¥æŸ„å¹¶
+//        åˆ›å»ºå’Œæ˜¾ç¤ºä¸»ç¨‹åºçª—å£ã€‚
 //
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
-	hInst = hInstance; // ½«ÊµÀı¾ä±ú´æ´¢ÔÚÈ«¾Ö±äÁ¿ÖĞ
+	hInst = hInstance; // å°†å®ä¾‹å¥æŸ„å­˜å‚¨åœ¨å…¨å±€å˜é‡ä¸­
 
 	HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT, 0, 800, 450, nullptr, nullptr, hInstance, nullptr);
@@ -138,12 +138,12 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 		return FALSE;
 	}
 
-	//³õÊ¼»¯ËÑË÷±à¼­¿ò
+	//åˆå§‹åŒ–æœç´¢ç¼–è¾‘æ¡†
 	hSearchEdit = CreateWindow(_T("EDIT"), NULL, WS_CHILD | WS_VISIBLE | WS_BORDER | ES_AUTOHSCROLL | ES_LEFT,
 		70, 30, 200, 30, hWnd, (HMENU)ID_SEARCH_EDIT, hInst, NULL);
 	oldEditSearchProc = (WNDPROC)SetWindowLongPtr(hSearchEdit, GWLP_WNDPROC, (LONG_PTR)subEditSearchProc);
 
-	//³õÊ¼»¯ËÑË÷Àà±ğÏÂÀ­ÁĞ±í
+	//åˆå§‹åŒ–æœç´¢ç±»åˆ«ä¸‹æ‹‰åˆ—è¡¨
 	hClassComboBox = CreateWindow(WC_COMBOBOX, _T(""), CBS_DROPDOWNLIST | CBS_HASSTRINGS | WS_CHILD | WS_OVERLAPPED | WS_VISIBLE ,
 		310, 30, 100, 500, hWnd, (HMENU)ID_SEARCH_COMBOBOX, hInst, NULL);
 	
@@ -189,19 +189,19 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	// Send the CB_SETCURSEL message to display an initial item in the selection field  
 	SendMessage(hClassComboBox, CB_SETCURSEL, (WPARAM)0, (LPARAM)0);
 	
-	//³õÊ¼»¯ËÑË÷°´Å¥
-	hSearchButton = CreateWindow(_T("BUTTON"), _T("ËÑË÷"), WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON,
+	//åˆå§‹åŒ–æœç´¢æŒ‰é’®
+	hSearchButton = CreateWindow(_T("BUTTON"), _T("æœç´¢"), WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON,
 		430, 30, 100, 30, hWnd, (HMENU)ID_SEARCH_BUTTON, hInst, NULL);
 	
-	//³õÊ¼»¯ÎÄ±¾
-	CreateWindow(_T("static"), _T("´ÊÓï"), WS_CHILD | WS_VISIBLE | SS_LEFT, 30, 30, 30, 30, hWnd,
+	//åˆå§‹åŒ–æ–‡æœ¬
+	CreateWindow(_T("static"), _T("è¯è¯­"), WS_CHILD | WS_VISIBLE | SS_LEFT, 30, 30, 30, 30, hWnd,
 		NULL, hInst, NULL);
-	CreateWindow(_T("static"), _T("´ÊÀà"), WS_CHILD | WS_VISIBLE | SS_LEFT, 270, 30, 30, 30, hWnd,
+	CreateWindow(_T("static"), _T("è¯ç±»"), WS_CHILD | WS_VISIBLE | SS_LEFT, 270, 30, 30, 30, hWnd,
 		NULL, hInst, NULL);
 
-	CreateWindow(_T("static"), _T("´Êµä1"), WS_CHILD | WS_VISIBLE | SS_LEFT, 30, 110, 40, 30, hWnd,
+	CreateWindow(_T("static"), _T("è¯å…¸1"), WS_CHILD | WS_VISIBLE | SS_LEFT, 30, 110, 40, 30, hWnd,
 		NULL, hInst, NULL);
-	CreateWindow(_T("static"), _T("´Êµä2"), WS_CHILD | WS_VISIBLE | SS_LEFT, 30, 210, 40, 30, hWnd,
+	CreateWindow(_T("static"), _T("è¯å…¸2"), WS_CHILD | WS_VISIBLE | SS_LEFT, 30, 210, 40, 30, hWnd,
 		NULL, hInst, NULL);
 
 	LoadStringW(hInstance, ID_TEXT_STATIC_SIMILARITY, temp, MAX_LOADSTRING);
@@ -222,7 +222,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	hNewRelationshipText = CreateWindow(_T("static"), _T("test"), WS_CHILD | WS_VISIBLE| WS_BORDER | SS_LEFT, 650, 70, 90, 30, hWnd,
 		(HMENU)ID_TEXT_NEW_RELATIONSHIP, hInst, NULL);
 
-	//³õÊ¼»¯´Êµä1µÄÁĞ±íÊÓÍ¼
+	//åˆå§‹åŒ–è¯å…¸1çš„åˆ—è¡¨è§†å›¾
 	hDictionaryOneListView = CreateWindow(WC_LISTVIEW, L"",	WS_CHILD | WS_VISIBLE | LVS_REPORT | WS_BORDER,
 		30, 140, 600,45, hWnd,	(HMENU)ID_DICTIONARY_ONE_LISTVIEW,	hInst,	NULL);
 	
@@ -253,7 +253,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 			return FALSE;
 	}
 	
-	//³õÊ¼»¯´Êµä2µÄÁĞ±íÊÓÍ¼
+	//åˆå§‹åŒ–è¯å…¸2çš„åˆ—è¡¨è§†å›¾
 	hDictionaryTwoListView = CreateWindow(WC_LISTVIEW, L"", WS_CHILD | WS_VISIBLE | LVS_REPORT | WS_BORDER,
 		30, 240, 600, 45, hWnd, (HMENU)ID_DICTIONARY_ONE_LISTVIEW, hInst, NULL);
 
@@ -277,25 +277,25 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 			return FALSE;
 	}
 	
-	//³õÊ¼»¯¶ÔÓ¦¹ØÏµ°´Å¥
-	hRelationEqualButton = CreateWindow(_T("BUTTON"), _T("ÏàµÈ"), WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON,
+	//åˆå§‹åŒ–å¯¹åº”å…³ç³»æŒ‰é’®
+	hRelationEqualButton = CreateWindow(_T("BUTTON"), _T("ç›¸ç­‰"), WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON,
 		650, 120, 100, 30, hWnd, (HMENU)ID_EQUAL_BUTTON, hInst, NULL);
 
-	hRelationNotEqualButton = CreateWindow(_T("BUTTON"), _T("²»ÏàµÈ"), WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON,
+	hRelationNotEqualButton = CreateWindow(_T("BUTTON"), _T("ä¸ç›¸ç­‰"), WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON,
 		650, 170, 100, 30, hWnd, (HMENU)ID_NOT_EQUAL_BUTTON, hInst, NULL);
 
-	hRelationUnsureButton = CreateWindow(_T("BUTTON"), _T("²»È·¶¨"), WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON,
+	hRelationUnsureButton = CreateWindow(_T("BUTTON"), _T("ä¸ç¡®å®š"), WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON,
 		650, 220, 100, 30, hWnd, (HMENU)ID_UNSURE_BUTTON, hInst, NULL);
 	
-	hRelationBelongButton = CreateWindow(_T("BUTTON"), _T("ÊôÓÚ"), WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON,
+	hRelationBelongButton = CreateWindow(_T("BUTTON"), _T("å±äº"), WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON,
 		650, 270, 100, 30, hWnd, (HMENU)ID_BELONG_BUTTON, hInst, NULL);
 	
-	//ÏÂÒ»¸ö°´Å¥
+	//ä¸‹ä¸€ä¸ªæŒ‰é’®
 
-	hRelationBelongButton = CreateWindow(_T("BUTTON"), _T("ÏÂÒ»´ÊÒå"), WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON,
+	hRelationBelongButton = CreateWindow(_T("BUTTON"), _T("ä¸‹ä¸€è¯ä¹‰"), WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON,
 		200, 330, 100, 30, hWnd, (HMENU)ID_NEXT_SENSE_BUTTON, hInst, NULL);
 	
-	hRelationBelongButton = CreateWindow(_T("BUTTON"), _T("ÏÂÒ»´ÊÓï"), WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON,
+	hRelationBelongButton = CreateWindow(_T("BUTTON"), _T("ä¸‹ä¸€è¯è¯­"), WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON,
 		350, 330, 100, 30, hWnd, (HMENU)ID_NEXT_WORD_BUTTON, hInst, NULL);
 
 
@@ -307,7 +307,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 }
 
 
-// ËÑË÷±à¼­¿ò µÄÏûÏ¢´¦Àíº¯Êı
+// æœç´¢ç¼–è¾‘æ¡† çš„æ¶ˆæ¯å¤„ç†å‡½æ•°
 LRESULT CALLBACK subEditSearchProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
@@ -331,13 +331,13 @@ LRESULT CALLBACK subEditSearchProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lP
 
 
 //
-//  º¯Êı: WndProc(HWND, UINT, WPARAM, LPARAM)
+//  å‡½æ•°: WndProc(HWND, UINT, WPARAM, LPARAM)
 //
-//  Ä¿µÄ:    ´¦ÀíÖ÷´°¿ÚµÄÏûÏ¢¡£
+//  ç›®çš„:    å¤„ç†ä¸»çª—å£çš„æ¶ˆæ¯ã€‚
 //
-//  WM_COMMAND  - ´¦ÀíÓ¦ÓÃ³ÌĞò²Ëµ¥
-//  WM_PAINT    - »æÖÆÖ÷´°¿Ú
-//  WM_DESTROY  - ·¢ËÍÍË³öÏûÏ¢²¢·µ»Ø
+//  WM_COMMAND  - å¤„ç†åº”ç”¨ç¨‹åºèœå•
+//  WM_PAINT    - ç»˜åˆ¶ä¸»çª—å£
+//  WM_DESTROY  - å‘é€é€€å‡ºæ¶ˆæ¯å¹¶è¿”å›
 //
 //
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -346,7 +346,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_COMMAND:
 	{
-		// ·ÖÎöwParamÈ«²¿: 
+		// åˆ†æwParamå…¨éƒ¨: 
 		//switch (wParam)
 		//{
 		//case CBN_SELCHANGE:
@@ -355,11 +355,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		//}
 		//break;
 		//default:
-		//	//¼ÌĞø´¦Àí
+		//	//ç»§ç»­å¤„ç†
 		//	break;
 		//}
 
-		// ·ÖÎöwParam¸ßÎ»: 
+		// åˆ†æwParamé«˜ä½: 
 		switch (HIWORD(wParam))
 		{
 		case CBN_SELCHANGE: 
@@ -379,33 +379,33 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 			break;
 		default:
-			//¼ÌĞø´¦Àí
+			//ç»§ç»­å¤„ç†
 			break;
 		}
 		
-		// ·ÖÎöwParamµÍÎ»: 
+		// åˆ†æwParamä½ä½: 
 		switch (LOWORD(wParam))
 		{
 		case ID_SEARCH_BUTTON:
-			MessageBox(hWnd, L"Äúµã»÷ÁËÒ»¸ö°´Å¥¡£", L"ÌáÊ¾", MB_OK);
+			MessageBox(hWnd, L"æ‚¨ç‚¹å‡»äº†ä¸€ä¸ªæŒ‰é’®ã€‚", L"æç¤º", MB_OK);
 			break;
 		case ID_EQUAL_BUTTON:
-			MessageBox(hWnd, L"µã»÷ÁËÒ»¸ö°´Å¥¡£", L"ÌáÊ¾", MB_OKCANCEL);
+			MessageBox(hWnd, L"ç‚¹å‡»äº†ä¸€ä¸ªæŒ‰é’®ã€‚", L"æç¤º", MB_OKCANCEL);
 			break;
 		case ID_NOT_EQUAL_BUTTON:
-			MessageBox(hWnd, L"Ò»¸ö°´Å¥¡£", L"ÌáÊ¾", MB_OK);
+			MessageBox(hWnd, L"ä¸€ä¸ªæŒ‰é’®ã€‚", L"æç¤º", MB_OK);
 			break;
 		case ID_UNSURE_BUTTON:
-			MessageBox(hWnd, L"µã»÷°´Å¥¡£", L"ÌáÊ¾", MB_OKCANCEL);
+			MessageBox(hWnd, L"ç‚¹å‡»æŒ‰é’®ã€‚", L"æç¤º", MB_OKCANCEL);
 			break;
 		case ID_BELONG_BUTTON:
-			MessageBox(hWnd, L"µãÁË¸ö°´Å¥¡£", L"ÌáÊ¾", MB_OK);
+			MessageBox(hWnd, L"ç‚¹äº†ä¸ªæŒ‰é’®ã€‚", L"æç¤º", MB_OK);
 			break;
 		case ID_NEXT_SENSE_BUTTON:
-			MessageBox(hWnd, L"°´Å¥¡£", L"ÌáÊ¾", MB_OKCANCEL);
+			MessageBox(hWnd, L"æŒ‰é’®ã€‚", L"æç¤º", MB_OKCANCEL);
 			break;
 		case ID_NEXT_WORD_BUTTON:
-			MessageBox(hWnd, L"µã°´Å¥¡£", L"Tip", MB_OK);
+			MessageBox(hWnd, L"ç‚¹æŒ‰é’®ã€‚", L"Tip", MB_OK);
 			break;
 
 
@@ -419,12 +419,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			return DefWindowProc(hWnd, message, wParam, lParam);
 		}
 
-		//// ·ÖÎölParamÈ«²¿: 
+		//// åˆ†ælParamå…¨éƒ¨: 
 		//switch (lParam)
 		//{
 		//case ID_SEARCH_BUTTON:
 		//{
-		//	MessageBox(hWnd, L"Äúµã»÷ÁËÒ»¸ö°´Å¥¡£", L"ÌáÊ¾", MB_OK);
+		//	MessageBox(hWnd, L"æ‚¨ç‚¹å‡»äº†ä¸€ä¸ªæŒ‰é’®ã€‚", L"æç¤º", MB_OK);
 		//}
 		//break;
 		//default:
@@ -438,7 +438,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 		PAINTSTRUCT ps;
 		HDC hdc = BeginPaint(hWnd, &ps);
-		// TODO: ÔÚ´Ë´¦Ìí¼ÓÊ¹ÓÃ hdc µÄÈÎºÎ»æÍ¼´úÂë...
+		// TODO: åœ¨æ­¤å¤„æ·»åŠ ä½¿ç”¨ hdc çš„ä»»ä½•ç»˜å›¾ä»£ç ...
 		
 		EndPaint(hWnd, &ps);
 	}
@@ -453,7 +453,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-// ¡°¹ØÓÚ¡±¿òµÄÏûÏ¢´¦Àí³ÌĞò¡£
+// â€œå…³äºâ€æ¡†çš„æ¶ˆæ¯å¤„ç†ç¨‹åºã€‚
 INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	UNREFERENCED_PARAMETER(lParam);
