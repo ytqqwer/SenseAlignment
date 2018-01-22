@@ -8,10 +8,6 @@
 #include <commdlg.h>
 #include <CommCtrl.h>
 
-//// 导入静态库  
-//#pragma comment(lib, "Comctl32.lib")  
-//// 开启视觉效果 Copy from MSDN  
-//#pragma comment(linker,"\"/manifestdependency:type='win32' name = 'Microsoft.Windows.Common-Controls' version = '6.0.0.0' processorArchitecture = '*' publicKeyToken = '6595b64144ccf1df' language = '*'\"")
 
 #define MAX_LOADSTRING 100
 
@@ -65,12 +61,23 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 	LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
 	LoadStringW(hInstance, IDC_SENSEALIGNMENT, szWindowClass, MAX_LOADSTRING);
 	MyRegisterClass(hInstance);
-	
+
 	// 执行应用程序初始化: 
 	if (!InitInstance(hInstance, nCmdShow))
 	{
 		return FALSE;
 	}
+
+	xlnt::workbook wb;
+	xlnt::worksheet ws = wb.active_sheet();
+	ws.cell("A1").value(5);
+	ws.cell("B2").value(u8"中文");
+	ws.cell("C3").formula("=RAND()");
+	ws.merge_cells("C3:C4");
+	ws.freeze_panes("B2");
+	wb.save("example.xlsx");
+
+
 
 	HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_SENSEALIGNMENT));
 
@@ -144,15 +151,15 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	oldEditSearchProc = (WNDPROC)SetWindowLongPtr(hSearchEdit, GWLP_WNDPROC, (LONG_PTR)subEditSearchProc);
 
 	//初始化搜索类别下拉列表
-	hClassComboBox = CreateWindow(WC_COMBOBOX, _T(""), CBS_DROPDOWNLIST | CBS_HASSTRINGS | WS_CHILD | WS_OVERLAPPED | WS_VISIBLE ,
+	hClassComboBox = CreateWindow(WC_COMBOBOX, _T(""), CBS_DROPDOWNLIST | CBS_HASSTRINGS | WS_CHILD | WS_OVERLAPPED | WS_VISIBLE,
 		310, 30, 100, 500, hWnd, (HMENU)ID_SEARCH_COMBOBOX, hInst, NULL);
-	
+
 	// load the combobox with item list. Send a CB_ADDSTRING message to load each item
 	TCHAR temp[100];
 
 	LoadStringW(hInstance, ID_PART_OF_SPEECH_N, temp, MAX_LOADSTRING);
 	SendMessage(hClassComboBox, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)temp);
-	
+
 	LoadStringW(hInstance, ID_PART_OF_SPEECH_V, temp, MAX_LOADSTRING);
 	SendMessage(hClassComboBox, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)temp);
 
@@ -170,7 +177,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 	LoadStringW(hInstance, ID_PART_OF_SPEECH_D, temp, MAX_LOADSTRING);
 	SendMessage(hClassComboBox, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)temp);
-	
+
 	LoadStringW(hInstance, ID_PART_OF_SPEECH_P, temp, MAX_LOADSTRING);
 	SendMessage(hClassComboBox, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)temp);
 
@@ -185,15 +192,15 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 	LoadStringW(hInstance, ID_PART_OF_SPEECH_O, temp, MAX_LOADSTRING);
 	SendMessage(hClassComboBox, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)temp);
-	
+
 	// Send the CB_SETCURSEL message to display an initial item in the selection field  
 	SendMessage(hClassComboBox, CB_SETCURSEL, (WPARAM)0, (LPARAM)0);
-	
+
 	//初始化搜索按钮
 	hSearchButton = CreateWindow(_T("BUTTON"), _T("搜索"), WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON,
 		430, 30, 100, 30, hWnd, (HMENU)ID_SEARCH_BUTTON, hInst, NULL);
-	
-	//初始化文本
+
+	//初始化文本	
 	CreateWindow(_T("static"), _T("词语"), WS_CHILD | WS_VISIBLE | SS_LEFT, 30, 30, 30, 30, hWnd,
 		NULL, hInst, NULL);
 	CreateWindow(_T("static"), _T("词类"), WS_CHILD | WS_VISIBLE | SS_LEFT, 270, 30, 30, 30, hWnd,
@@ -209,7 +216,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 		(HMENU)ID_TEXT_STATIC_SIMILARITY, hInst, NULL);
 	hSimilarityText = CreateWindow(_T("static"), _T("test"), WS_CHILD | WS_VISIBLE | WS_BORDER | SS_LEFT, 650, 10, 90, 30, hWnd,
 		(HMENU)ID_TEXT_SIMILARITY, hInst, NULL);
-	
+
 	LoadStringW(hInstance, ID_TEXT_STATIC_RELATIONSHIP, temp, MAX_LOADSTRING);
 	HWND hRelationshipStaticText = CreateWindow(_T("static"), temp, WS_CHILD | WS_VISIBLE | SS_LEFT, 550, 40, 100, 30, hWnd,
 		(HMENU)ID_TEXT_STATIC_RELATIONSHIP, hInst, NULL);
@@ -219,13 +226,19 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	LoadStringW(hInstance, ID_TEXT_STATIC_NEW_RELATIONSHIP, temp, MAX_LOADSTRING);
 	HWND hNewRelationshipStaticText = CreateWindow(_T("static"), temp, WS_CHILD | WS_VISIBLE | SS_LEFT, 550, 70, 100, 30, hWnd,
 		(HMENU)ID_TEXT_STATIC_NEW_RELATIONSHIP, hInst, NULL);
-	hNewRelationshipText = CreateWindow(_T("static"), _T("test"), WS_CHILD | WS_VISIBLE| WS_BORDER | SS_LEFT, 650, 70, 90, 30, hWnd,
+	hNewRelationshipText = CreateWindow(_T("static"), _T("test"), WS_CHILD | WS_VISIBLE | WS_BORDER | SS_LEFT, 650, 70, 90, 30, hWnd,
 		(HMENU)ID_TEXT_NEW_RELATIONSHIP, hInst, NULL);
 
+	HFONT hFont = CreateFont(20, 0, 0, 0, 0, FALSE, FALSE, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_SWISS, L"微软雅黑");//创建字体
+	SendMessage(hSearchButton, WM_SETFONT, (WPARAM)hFont, TRUE);//发送设置字体消息
+	SendMessage(hSearchEdit, WM_SETFONT, (WPARAM)hFont, TRUE);//发送设置字体消息
+	SendMessage(hNewRelationshipStaticText, WM_SETFONT, (WPARAM)hFont, TRUE);//发送设置字体消息
+	SendMessage(hRelationshipStaticText, WM_SETFONT, (WPARAM)hFont, TRUE);//发送设置字体消息
+
 	//初始化词典1的列表视图
-	hDictionaryOneListView = CreateWindow(WC_LISTVIEW, L"",	WS_CHILD | WS_VISIBLE | LVS_REPORT | WS_BORDER,
-		30, 140, 600,45, hWnd,	(HMENU)ID_DICTIONARY_ONE_LISTVIEW,	hInst,	NULL);
-	
+	hDictionaryOneListView = CreateWindow(WC_LISTVIEW, L"", WS_CHILD | WS_VISIBLE | LVS_REPORT | WS_BORDER,
+		30, 140, 600, 45, hWnd, (HMENU)ID_DICTIONARY_ONE_LISTVIEW, hInst, NULL);
+
 	WCHAR szText[256];     // Temporary buffer.
 	LVCOLUMN lvc;
 	int iCol;
@@ -242,17 +255,17 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 		lvc.fmt = LVCFMT_LEFT;		// Left-aligned column.
 
 		if (iCol < 2)				// Width of column in pixels.
-			lvc.cx = 100;             
+			lvc.cx = 100;
 		else
 			lvc.cx = 200;
-									// Load the names of the column headings from the string resources.
+		// Load the names of the column headings from the string resources.
 		LoadString(hInst, ID_DICTIONARY_COLUMN_WORDS + iCol, szText, sizeof(szText) / sizeof(szText[0]));
 
 		// Insert the columns into the list view.
 		if (ListView_InsertColumn(hDictionaryOneListView, iCol, &lvc) == -1)
 			return FALSE;
 	}
-	
+
 	//初始化词典2的列表视图
 	hDictionaryTwoListView = CreateWindow(WC_LISTVIEW, L"", WS_CHILD | WS_VISIBLE | LVS_REPORT | WS_BORDER,
 		30, 240, 600, 45, hWnd, (HMENU)ID_DICTIONARY_ONE_LISTVIEW, hInst, NULL);
@@ -276,7 +289,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 		if (ListView_InsertColumn(hDictionaryTwoListView, iCol, &lvc) == -1)
 			return FALSE;
 	}
-	
+
 	//初始化对应关系按钮
 	hRelationEqualButton = CreateWindow(_T("BUTTON"), _T("相等"), WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON,
 		650, 120, 100, 30, hWnd, (HMENU)ID_EQUAL_BUTTON, hInst, NULL);
@@ -286,15 +299,15 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 	hRelationUnsureButton = CreateWindow(_T("BUTTON"), _T("不确定"), WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON,
 		650, 220, 100, 30, hWnd, (HMENU)ID_UNSURE_BUTTON, hInst, NULL);
-	
+
 	hRelationBelongButton = CreateWindow(_T("BUTTON"), _T("属于"), WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON,
 		650, 270, 100, 30, hWnd, (HMENU)ID_BELONG_BUTTON, hInst, NULL);
-	
+
 	//下一个按钮
 
 	hRelationBelongButton = CreateWindow(_T("BUTTON"), _T("下一词义"), WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON,
 		200, 330, 100, 30, hWnd, (HMENU)ID_NEXT_SENSE_BUTTON, hInst, NULL);
-	
+
 	hRelationBelongButton = CreateWindow(_T("BUTTON"), _T("下一词语"), WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON,
 		350, 330, 100, 30, hWnd, (HMENU)ID_NEXT_WORD_BUTTON, hInst, NULL);
 
@@ -362,7 +375,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		// 分析wParam高位: 
 		switch (HIWORD(wParam))
 		{
-		case CBN_SELCHANGE: 
+		case CBN_SELCHANGE:
 		{
 			// If the user makes a selection from the list:
 			//   Send CB_GETCURSEL message to get the index of the selected list item.
@@ -377,12 +390,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			MessageBox(hWnd, (LPCWSTR)ListItem, TEXT("Item Selected"), MB_OK);
 
 		}
-			break;
+		break;
 		default:
 			//继续处理
 			break;
 		}
-		
+
 		// 分析wParam低位: 
 		switch (LOWORD(wParam))
 		{
@@ -439,7 +452,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		PAINTSTRUCT ps;
 		HDC hdc = BeginPaint(hWnd, &ps);
 		// TODO: 在此处添加使用 hdc 的任何绘图代码...
-		
+
 		EndPaint(hWnd, &ps);
 	}
 	break;
