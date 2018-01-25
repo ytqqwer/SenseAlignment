@@ -14,7 +14,7 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
     <Filter Include="Object Libraries">
-      <UniqueIdentifier>{3fb8a120-a204-48f9-a103-8c36cd121dad}</UniqueIdentifier>
+      <UniqueIdentifier>{5611f86c-fc4e-4c4f-8cb8-cd1019605caa}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -62,31 +62,31 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <Object Include="..\..\xlnt-master\proj.win32\source\third-party\libstudxml\libstudxml.dir\Debug\genx.obj">
+    <Object Include="..\..\xlnt-master\proj.win32\source\third-party\libstudxml\libstudxml.dir\Release\char-props.obj">
       <Filter>Object Libraries</Filter>
     </Object>
-    <Object Include="..\..\xlnt-master\proj.win32\source\third-party\libstudxml\libstudxml.dir\Debug\parser.obj">
+    <Object Include="..\..\xlnt-master\proj.win32\source\third-party\libstudxml\libstudxml.dir\Release\genx.obj">
       <Filter>Object Libraries</Filter>
     </Object>
-    <Object Include="..\..\xlnt-master\proj.win32\source\third-party\libstudxml\libstudxml.dir\Debug\qname.obj">
+    <Object Include="..\..\xlnt-master\proj.win32\source\third-party\libstudxml\libstudxml.dir\Release\parser.obj">
       <Filter>Object Libraries</Filter>
     </Object>
-    <Object Include="..\..\xlnt-master\proj.win32\source\third-party\libstudxml\libstudxml.dir\Debug\serializer.obj">
+    <Object Include="..\..\xlnt-master\proj.win32\source\third-party\libstudxml\libstudxml.dir\Release\qname.obj">
       <Filter>Object Libraries</Filter>
     </Object>
-    <Object Include="..\..\xlnt-master\proj.win32\source\third-party\libstudxml\libstudxml.dir\Debug\value-traits.obj">
+    <Object Include="..\..\xlnt-master\proj.win32\source\third-party\libstudxml\libstudxml.dir\Release\serializer.obj">
       <Filter>Object Libraries</Filter>
     </Object>
-    <Object Include="..\..\xlnt-master\proj.win32\source\third-party\libstudxml\libstudxml.dir\Debug\xmlparse.obj">
+    <Object Include="..\..\xlnt-master\proj.win32\source\third-party\libstudxml\libstudxml.dir\Release\value-traits.obj">
       <Filter>Object Libraries</Filter>
     </Object>
-    <Object Include="..\..\xlnt-master\proj.win32\source\third-party\libstudxml\libstudxml.dir\Debug\xmlrole.obj">
+    <Object Include="..\..\xlnt-master\proj.win32\source\third-party\libstudxml\libstudxml.dir\Release\xmlparse.obj">
       <Filter>Object Libraries</Filter>
     </Object>
-    <Object Include="..\..\xlnt-master\proj.win32\source\third-party\libstudxml\libstudxml.dir\Debug\xmltok.obj">
+    <Object Include="..\..\xlnt-master\proj.win32\source\third-party\libstudxml\libstudxml.dir\Release\xmlrole.obj">
       <Filter>Object Libraries</Filter>
     </Object>
-    <Object Include="..\..\xlnt-master\proj.win32\source\third-party\libstudxml\libstudxml.dir\Debug\char-props.obj">
+    <Object Include="..\..\xlnt-master\proj.win32\source\third-party\libstudxml\libstudxml.dir\Release\xmltok.obj">
       <Filter>Object Libraries</Filter>
     </Object>
   </ItemGroup>

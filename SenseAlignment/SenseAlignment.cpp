@@ -15,11 +15,9 @@
 // 全局变量: 
 HINSTANCE hInst;                                // 当前实例
 WCHAR szTitle[MAX_LOADSTRING];                  // 标题栏文本
-WCHAR szWindowClass[MAX_LOADSTRING];            // 主窗口类名
-
+WCHAR szWindowClassMain[MAX_LOADSTRING];            // 主窗口类名
 
 ExcelReader* reader;						//读取器
-
 
 
 HWND hSearchEdit;							// 搜索框句柄
@@ -28,9 +26,6 @@ HWND hSearchButton;							// 搜索按钮句柄
 
 HWND hDictionaryListView_One;					// 词典1列表视图句柄
 HWND hDictionaryListView_Two;					// 词典2列表视图句柄
-
-//HWND hDictionaryOneDetailsListView;				// 词典1更详细列表视图句柄
-//HWND hDictionaryTwoDetailsListView;				// 词典2更详细列表视图句柄
 
 HWND hSimilarityText;						// 相似度
 HWND hRelationshipText;						// 对应关系
@@ -49,6 +44,7 @@ ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK    Detail(HWND, UINT, WPARAM, LPARAM);
 
 //搜索编辑框处理过程
 LRESULT CALLBACK	subEditSearchProc(HWND, UINT, WPARAM, LPARAM);
@@ -57,7 +53,7 @@ LRESULT CALLBACK	subEditSearchProc(HWND, UINT, WPARAM, LPARAM);
 std::string wstringToString(const std::wstring& wstr)
 {
 	LPCWSTR pwszSrc = wstr.c_str();
-	int nLen = WideCharToMultiByte(CP_ACP, 0, pwszSrc, -1, NULL, 0, NULL, NULL);
+	int nLen = WideCharToMultiByte(CP_UTF8, 0, pwszSrc, -1, NULL, 0, NULL, NULL);
 	if (nLen == 0)
 		return std::string("");
 
@@ -65,7 +61,7 @@ std::string wstringToString(const std::wstring& wstr)
 	if (!pszDst)
 		return std::string("");
 
-	WideCharToMultiByte(CP_ACP, 0, pwszSrc, -1, pszDst, nLen, NULL, NULL);
+	WideCharToMultiByte(CP_UTF8, 0, pwszSrc, -1, pszDst, nLen, NULL, NULL);
 	std::string str(pszDst);
 	delete[] pszDst;
 	pszDst = NULL;
@@ -104,7 +100,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 
 	// 初始化全局字符串
 	LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
-	LoadStringW(hInstance, IDC_SENSEALIGNMENT, szWindowClass, MAX_LOADSTRING);
+	LoadStringW(hInstance, IDC_SENSEALIGNMENT, szWindowClassMain, MAX_LOADSTRING);
 	MyRegisterClass(hInstance);
 
 	// 执行应用程序初始化: 
@@ -142,23 +138,21 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 //
 ATOM MyRegisterClass(HINSTANCE hInstance)
 {
-	WNDCLASSEXW wcex;
+	WNDCLASSEXW wcexMain;
+	wcexMain.cbSize = sizeof(WNDCLASSEX);
+	wcexMain.style = CS_HREDRAW | CS_VREDRAW;
+	wcexMain.lpfnWndProc = WndProc;
+	wcexMain.cbClsExtra = 0;
+	wcexMain.cbWndExtra = 0;
+	wcexMain.hInstance = hInstance;
+	wcexMain.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_SENSEALIGNMENT));
+	wcexMain.hCursor = LoadCursor(nullptr, IDC_ARROW);
+	wcexMain.hbrBackground = (HBRUSH)(COLOR_WINDOW + 0);
+	wcexMain.lpszMenuName = MAKEINTRESOURCEW(IDC_SENSEALIGNMENT);
+	wcexMain.lpszClassName = szWindowClassMain;
+	wcexMain.hIconSm = LoadIcon(wcexMain.hInstance, MAKEINTRESOURCE(IDI_SMALL));
 
-	wcex.cbSize = sizeof(WNDCLASSEX);
-
-	wcex.style = CS_HREDRAW | CS_VREDRAW;
-	wcex.lpfnWndProc = WndProc;
-	wcex.cbClsExtra = 0;
-	wcex.cbWndExtra = 0;
-	wcex.hInstance = hInstance;
-	wcex.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_SENSEALIGNMENT));
-	wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
-	wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 0);
-	wcex.lpszMenuName = MAKEINTRESOURCEW(IDC_SENSEALIGNMENT);
-	wcex.lpszClassName = szWindowClass;
-	wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
-
-	return RegisterClassExW(&wcex);
+	return RegisterClassExW(&wcexMain);
 }
 
 //
@@ -175,7 +169,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
 	hInst = hInstance; // 将实例句柄存储在全局变量中
 
-	HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
+	HWND hWnd = CreateWindowW(szWindowClassMain, szTitle, WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT, 0, 800, 450, nullptr, nullptr, hInstance, nullptr);
 
 	if (!hWnd)
@@ -334,8 +328,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 	//////////////////////////////////////////////////////////////////////
 	//下一个按钮
-	hRelationBelongButton = CreateWindow(_T("BUTTON"), _T("下一词义"), WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON,
-		200, 330, 100, 30, hWnd, (HMENU)ID_NEXT_SENSE_BUTTON, hInst, NULL);
+	hRelationBelongButton = CreateWindow(_T("BUTTON"), _T("详情"), WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON,
+		200, 330, 100, 30, hWnd, (HMENU)ID_MORE_DETAIL_BUTTON, hInst, NULL);
 
 	hRelationBelongButton = CreateWindow(_T("BUTTON"), _T("下一词语"), WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON,
 		350, 330, 100, 30, hWnd, (HMENU)ID_NEXT_WORD_BUTTON, hInst, NULL);
@@ -377,7 +371,6 @@ void ResetListViewData()
 	ListView_DeleteAllItems(hDictionaryListView_Two);
 
 }
-
 
 void selectColumns()
 {
@@ -534,8 +527,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		case ID_BELONG_BUTTON:
 			MessageBox(hWnd, L"点了个按钮。", L"提示", MB_OK);
 			break;
-		case ID_NEXT_SENSE_BUTTON:
-			MessageBox(hWnd, L"按钮。", L"提示", MB_OKCANCEL);
+		case ID_MORE_DETAIL_BUTTON:
+			DialogBox(hInst, MAKEINTRESOURCE(IDD_DETAIL), hWnd, Detail);
 			break;
 		case ID_NEXT_WORD_BUTTON:
 		{
@@ -561,8 +554,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			WCHAR strFilename[MAX_PATH];//存放文件名  
 										//初始化  
 			ZeroMemory(&opfn, sizeof(OPENFILENAME));
-			opfn.lStructSize = sizeof(OPENFILENAME);//结构体大小  
-													//设置过滤  
+			opfn.lStructSize = sizeof(OPENFILENAME);//结构体大小
+													//设置过滤
 			opfn.lpstrFilter = L"xlsx文件\0*.xlsx\0";
 			//默认过滤器索引设为1  
 			opfn.nFilterIndex = 1;
@@ -631,6 +624,26 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 
 	case WM_COMMAND:
 		if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
+		{
+			EndDialog(hDlg, LOWORD(wParam));
+			return (INT_PTR)TRUE;
+		}
+		break;
+	}
+	return (INT_PTR)FALSE;
+}
+
+// “详情”框的消息处理程序。
+INT_PTR CALLBACK Detail(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	UNREFERENCED_PARAMETER(lParam);
+	switch (message)
+	{
+	case WM_INITDIALOG:
+		return (INT_PTR)TRUE;
+
+	case WM_COMMAND:
+		if (LOWORD(wParam) == ID_DETAIL_OK)
 		{
 			EndDialog(hDlg, LOWORD(wParam));
 			return (INT_PTR)TRUE;

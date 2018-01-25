@@ -1,8 +1,10 @@
 /*/
 !SenseAlignment/
 SenseAlignment/Debug/
+SenseAlignment/Release/
 
 SenseAlignment.sln
 *.aps
 SenseAlignment/SenseAlignment.aps
 *.xlsx
+SenseAlignment/SenseAlignment.aps

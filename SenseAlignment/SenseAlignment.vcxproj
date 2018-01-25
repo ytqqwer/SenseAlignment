@@ -82,6 +82,9 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>J:\Projects\xlnt-master\include;$(IncludePath)</IncludePath>
+    <LibraryPath>J:\Projects\xlnt-master\proj.win32\source\Release;J:\Projects\xlnt-master\proj.win32\source;$(LibraryPath)</LibraryPath>
+    <EmbedManifest>true</EmbedManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -117,16 +120,47 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <PrecompiledHeader>Use</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <DisableSpecificWarnings>4068</DisableSpecificWarnings>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <AdditionalOptions>%(AdditionalOptions) /bigobj</AdditionalOptions>
+      <AssemblerListingLocation>Release/</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <AdditionalIncludeDirectories>J:\Projects\xlnt-master\tests;J:\Projects\xlnt-master\source;J:\Projects\xlnt-master\third-party\libstudxml;J:\Projects\xlnt-master\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;XLNT_TEST_DATA_DIR=J:/Projects/xlnt-master/tests/data;XLNT_STATIC=1;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;XLNT_TEST_DATA_DIR=J:/Projects/xlnt-master/tests/data;XLNT_STATIC=1;CMAKE_INTDIR=\"Release\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>J:\Projects\xlnt-master\tests;J:\Projects\xlnt-master\tests\..\source;J:\Projects\xlnt-master\tests\..\third-party\libstudxml;J:\Projects\xlnt-master\source\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>J:\Projects\xlnt-master\tests;J:\Projects\xlnt-master\tests\..\source;J:\Projects\xlnt-master\tests\..\third-party\libstudxml;J:\Projects\xlnt-master\source\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
     <Link>
-      <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:X86</AdditionalOptions>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <AdditionalDependencies>J:/Projects/xlnt-master/proj.win32/source/Release/xlnt.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <ImportLibrary>J:/Projects/xlnt-master/proj.win32/Release/xlnt.lib</ImportLibrary>
+      <ProgramDataBaseFile>J:/Projects/xlnt-master/proj.win32/Release/xlnt.pdb</ProgramDataBaseFile>
+      <SubSystem>Windows</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -183,15 +217,15 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Object Include="..\..\xlnt-master\proj.win32\source\third-party\libstudxml\libstudxml.dir\Debug\char-props.obj" />
-    <Object Include="..\..\xlnt-master\proj.win32\source\third-party\libstudxml\libstudxml.dir\Debug\genx.obj" />
-    <Object Include="..\..\xlnt-master\proj.win32\source\third-party\libstudxml\libstudxml.dir\Debug\parser.obj" />
-    <Object Include="..\..\xlnt-master\proj.win32\source\third-party\libstudxml\libstudxml.dir\Debug\qname.obj" />
-    <Object Include="..\..\xlnt-master\proj.win32\source\third-party\libstudxml\libstudxml.dir\Debug\serializer.obj" />
-    <Object Include="..\..\xlnt-master\proj.win32\source\third-party\libstudxml\libstudxml.dir\Debug\value-traits.obj" />
-    <Object Include="..\..\xlnt-master\proj.win32\source\third-party\libstudxml\libstudxml.dir\Debug\xmlparse.obj" />
-    <Object Include="..\..\xlnt-master\proj.win32\source\third-party\libstudxml\libstudxml.dir\Debug\xmlrole.obj" />
-    <Object Include="..\..\xlnt-master\proj.win32\source\third-party\libstudxml\libstudxml.dir\Debug\xmltok.obj" />
+    <Object Include="..\..\xlnt-master\proj.win32\source\third-party\libstudxml\libstudxml.dir\Release\char-props.obj" />
+    <Object Include="..\..\xlnt-master\proj.win32\source\third-party\libstudxml\libstudxml.dir\Release\genx.obj" />
+    <Object Include="..\..\xlnt-master\proj.win32\source\third-party\libstudxml\libstudxml.dir\Release\parser.obj" />
+    <Object Include="..\..\xlnt-master\proj.win32\source\third-party\libstudxml\libstudxml.dir\Release\qname.obj" />
+    <Object Include="..\..\xlnt-master\proj.win32\source\third-party\libstudxml\libstudxml.dir\Release\serializer.obj" />
+    <Object Include="..\..\xlnt-master\proj.win32\source\third-party\libstudxml\libstudxml.dir\Release\value-traits.obj" />
+    <Object Include="..\..\xlnt-master\proj.win32\source\third-party\libstudxml\libstudxml.dir\Release\xmlparse.obj" />
+    <Object Include="..\..\xlnt-master\proj.win32\source\third-party\libstudxml\libstudxml.dir\Release\xmlrole.obj" />
+    <Object Include="..\..\xlnt-master\proj.win32\source\third-party\libstudxml\libstudxml.dir\Release\xmltok.obj" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

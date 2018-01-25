@@ -21,16 +21,17 @@ void ExcelReader::loadXlsxFile(const std::string & filename)
 		//isOpen = false;
 	}
 
-	wb = new xlnt::workbook();
-	wb->load(filename);
+	wb = new xlnt::workbook();	
+	wb->load(filename);		//为了支持中文路径,传入的路径字符串已经是宽字符编码
 	ws = wb->active_sheet();
-
+	
 	//统计总行数
 	//最大行数减一，去掉列名
 	auto rows = ws.rows(false);
 	maxRow = rows.length() - 1;
 
 	isOpen = true;
+
 }
 
 bool ExcelReader::isOpenFile()
